@@ -1,6 +1,9 @@
 # vue tasks
 
 > This project allows you to add and remove a book
+
+# Screenshot
+![screenshot](https://github.com/olawale-o/vue-tasks/blob/display-task/src/assets/screenshot.png?raw=true")
 # Built with 
 
 - HTML
