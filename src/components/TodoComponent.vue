@@ -3,7 +3,7 @@
     <li v-for="task in tasks" :key="task.index" class="todo-list">
       <div class="field todo-list__task">
         <label class="label">
-          <input type="checkbox" :checked="task.completed">
+          <input type="checkbox" :checked="task.completed" v-on:change="onUpdateStatus(task)">
           <span class="checkmark"></span>
         </label>
           <span class="todo-list__text">{{task.description}}</span>
@@ -15,6 +15,8 @@
 </template>
 
 <script>
+import { useStore } from 'vuex';
+import { updateStatus } from '@/store/task/actions/action_creators.js';
 export default {
   name: 'Todo',
   props: {
@@ -24,7 +26,13 @@ export default {
     }
   },
   setup() {
-   
+    const { dispatch, } = useStore();
+    const onUpdateStatus = (task) => {
+      dispatch(updateStatus(task));
+    };
+    return {
+      onUpdateStatus,
+    }
   }
 }
 </script>
