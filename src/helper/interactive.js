@@ -1,7 +1,6 @@
 let current = null;
 
-export const dragStart = (items, item) => {
-  console.log(item)
+export function dragStart(items, item){
   current = item
   for (let b = 0; b < items.length; b += 1) {
       const it = items[b];
@@ -9,33 +8,33 @@ export const dragStart = (items, item) => {
       it.classList.add('border');
     }
   }
-};
+}
 
-export const dragEnter = (item) =>{
+export function dragEnter(item){
   if (item !== current) {
     item.style.opacity = 0.2;
   }
-};
+}
 
-export const dragLeave = (item) => {
+export function dragLeave(item){
   if (item === current) {
     item.style.visibility = 'hidden';
   } else {
    item.style.opacity = 1;
   }
-};
+}
 
-export const dragEnd = (items, item) => {
+export function dragEnd(items, item){
+    console.log(item)
   for (let a = 0; a < items.length; a += 1) {
     const it = items[a];
     it.classList.remove('border');
     item.style.visibility = 'visible';
     it.style.opacity = 1;
   }
-};
+}
 
-export const drop = (items, item) => {
-    //console.log(item)
+export function drop(items, item){
   if (item !== current) {
     let currentpos = 0;
     let droppedpos = 0;
@@ -53,4 +52,4 @@ export const drop = (items, item) => {
       item.parentNode.insertBefore(current, item);
     }
   }
-};
+}
