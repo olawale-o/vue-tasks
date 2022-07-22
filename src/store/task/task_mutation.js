@@ -8,4 +8,7 @@ export const taskMutation = {
       }
     });
   },
+  updateAll: (state, { credentials }) => {
+    state.tasks = credentials;
+  },
 };

@@ -1,6 +1,16 @@
 <template>
   <ul class="todo-tasks" id="todo-tasks" ref="taskList">
-    <li v-for="task in tasks" :key="task.index" class="todo-list" :id="task.index">
+    <li
+      v-for="(task, i) in tasks"
+      :key="i"
+      class="todo-list"
+      :id="task.index"
+      draggable="true"
+      @dragstart="dragItem = i"
+      @dragend="onDragEnd"
+      @dragenter="dragEnterItem = i"
+      @dragover.prevent="onDragOver(i)"
+    >
       <div class="field todo-list__task">
         <label class="label">
           <input type="checkbox" :checked="task.completed" v-on:change="onUpdateStatus(task)">
@@ -8,63 +18,49 @@
         </label>
           <span class="todo-list__text">{{task.description}}</span>
           <i class="bx bx-trash-alt bin hide"></i>
-          <i class="bx bx-dots-vertical-rounded move" @mousedown="onMouseDown"></i>
+          <i class="bx bx-dots-vertical-rounded move"></i>
       </div>
     </li>
   </ul>
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useStore } from 'vuex';
-import { updateStatus } from '@/store/task/actions/action_creators.js';
-import { dragStart, dragEnter, dragLeave, dragEnd, drop} from '../helper/interactive.js'
+import { updateStatus, updateAll } from '@/store/task/actions/action_creators.js';
 export default {
   name: 'Todo',
-  props: {
-    tasks: {
-      required: true,
-      type: Array,
-    }
-  },
   setup() {
     const taskList = ref(null);
-    const { dispatch, } = useStore();
+    const dragItem = ref(null);
+    const dragEnterItem = ref(null);
+    const { dispatch, getters } = useStore();
+    const tasks = computed(() => getters['tasks/tasks']);
     const onUpdateStatus = (task) => {
       dispatch(updateStatus(task));
     };
-    const dragAll = (items) => {
-      items.forEach((item) => {
-        item.draggable = true;
-        item.addEventListener('dragstart', function(){
-          dragStart(items, this)
-        });
-        item.addEventListener('dragenter', function(){
-          dragEnter(this)
-        });
-        item.addEventListener('dragleave', function(e) {
-          e.preventDefault();
-          dragLeave(this)
-        });
-        item.addEventListener('dragend', function(){
-          dragEnd(items, this)
-        });
-        item.addEventListener('dragover', (event) => {
-          event.preventDefault();
-          item.style.opacity = 0.2;
-        });
-        item.addEventListener('drop', function(e){
-          e.preventDefault();
-          drop(items, this)
-        });
-      });
-    }
-    const onMouseDown = () => {
-      const items = taskList.value.querySelectorAll('li');
-      dragAll(items)
-    }
+
     return {
-      onUpdateStatus, onMouseDown, taskList
+      onUpdateStatus, taskList, dragItem, dragEnterItem, tasks,
+      onDragOver: (i) => {
+        console.log(i);
+      },
+      onDragEnd: () => {
+        // duplicate tasks array
+        let _tasks = [...tasks.value];
+
+        // remove drag item
+        const dragItemContent = _tasks.splice(dragItem.value, 1)[0];
+
+        // switch drag item with drag enter item
+        _tasks.splice(dragEnterItem.value, 0, dragItemContent);
+
+        // reset drag item and drag enter item
+        dragItem.value = null;
+        dragEnterItem.value = null;
+        // update array
+        dispatch(updateAll(_tasks));
+      }
     }
   }
 }
